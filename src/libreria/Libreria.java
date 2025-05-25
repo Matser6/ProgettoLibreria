@@ -6,7 +6,9 @@ public interface Libreria {
 
     public Libro rimuoviLibro(String isbn);
 
-    public boolean aggiungiLibro(Libro l);
+    public void aggiungiLibro(Libro l);
+
+    public boolean contieneLibro(String isbn);
 
 }
 

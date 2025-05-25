@@ -28,9 +28,18 @@ public class LibreriaLL implements Libreria {
     }
 
     @Override
-    public boolean aggiungiLibro(Libro l) {
+    public void aggiungiLibro(Libro l) {
         libri.add(l);
-        return true;
+    }
+
+    @Override
+    public boolean contieneLibro(String isbn) {
+        for(Libro lib : libri) {
+            if(lib.getIsbn().equals(isbn)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void setMethod(RicercaMethod ricercaMethod) {
