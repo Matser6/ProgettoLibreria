@@ -1,5 +1,6 @@
 package view;
 
+import libreria.LibreriaLL;
 import libro.Libro;
 
 import javax.swing.table.AbstractTableModel;
@@ -9,27 +10,23 @@ import java.util.List;
 
 class LibroTableModel extends AbstractTableModel {
     private final String[] colonne = {"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Stato Lettura"};
-    private final List<Libro> libri = new LinkedList<>();
+    private final LibreriaLL libreria;
 
-    public void aggiungiLibro(Libro l) {
-        libri.add(l);
-        fireTableRowsInserted(libri.size() - 1, libri.size() - 1);
+    public LibroTableModel(LibreriaLL libreria) {
+        this.libreria = libreria;
     }
 
-    public void rimuoviLibro(int rowIndex) {
-        if (rowIndex >= 0 && rowIndex < libri.size()) {
-            libri.remove(rowIndex);
-            fireTableRowsDeleted(rowIndex, rowIndex);
-        }
+    public void aggiornaLibri(){
+        fireTableDataChanged();
     }
 
     public Libro getLibroAt(int rowIndex) {
-        return libri.get(rowIndex);
+        return libreria.getLibri().get(rowIndex);
     }
 
     @Override
     public int getRowCount() {
-        return libri.size();
+        return libreria.getLibri().size();
     }
 
     @Override
@@ -44,6 +41,7 @@ class LibroTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        List<Libro> libri = libreria.getLibri();
         Libro libro = libri.get(rowIndex);
         return switch (columnIndex) {
             case 0 -> libro.getTitolo();

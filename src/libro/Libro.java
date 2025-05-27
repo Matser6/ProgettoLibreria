@@ -1,68 +1,74 @@
 package libro;
 
 public class Libro {
-    private String titolo;
-    private String autore;
-    private String isbn;
-    private String genere;
-    private Integer valutazione;
-    private StatoLettura statoLettura;
+    private final String titolo;
+    private final String autore;
+    private final String isbn;
+    private final String genere;
+    private final Integer valutazione;
+    private final Integer segnaPagina;
+    private final StatoLettura statoLettura;
 
-    public Libro(String titolo, String autore, String isbn, String genere, StatoLettura statoLettura) {
-        this.titolo = titolo;
-        this.autore = autore;
-        this.isbn = isbn;
-        this.genere = genere;
-        this.valutazione = 0;
-        this.statoLettura = statoLettura;
+    public static class BuilderLibro {
+        private final String titolo;
+        private final String autore;
+        private final String isbn;
+        private final String genere;
+        private final StatoLettura statoLettura;
+
+        private Integer valutazione = 0;
+        private Integer segnaPagina = 0;
+
+        public BuilderLibro(String titolo, String autore, String isbn, String genere, StatoLettura statoLettura) {
+            this.titolo = titolo;
+            this.autore = autore;
+            this.isbn = isbn;
+            this.genere = genere;
+            this.statoLettura = statoLettura;
+        }
+
+        public BuilderLibro valutazione(Integer valutazione) { this.valutazione = valutazione; return this; }
+        public BuilderLibro segnaPagina(Integer segnaPagina) { this.segnaPagina = segnaPagina; return this; }
+
+        public Libro build() { return new Libro(this); }
+    }
+
+    private Libro(BuilderLibro builder) {
+        this.titolo = builder.titolo;
+        this.autore = builder.autore;
+        this.isbn = builder.isbn;
+        this.genere = builder.genere;
+        this.valutazione = builder.valutazione;
+        this.segnaPagina = builder.segnaPagina;
+        this.statoLettura = builder.statoLettura;
     }
 
     public String getTitolo() {
         return titolo;
     }
 
-    public void setTitolo(String titolo) {
-        this.titolo = titolo;
-    }
-
     public String getAutore() {
         return autore;
-    }
-
-    public void setAutore(String autore) {
-        this.autore = autore;
     }
 
     public String getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
-
     public String getGenere() {
         return genere;
-    }
-
-    public void setGenere(String genere) {
-        this.genere = genere;
     }
 
     public Integer getValutazione() {
         return valutazione;
     }
 
-    public void setValutazione(Integer valutazione) {
-        this.valutazione = valutazione;
+    public Integer getSegnaPagina() {
+        return segnaPagina;
     }
 
     public StatoLettura getStatoLettura() {
         return statoLettura;
-    }
-
-    public void setStatoLettura(StatoLettura statoLettura) {
-        this.statoLettura = statoLettura;
     }
 
     public String toString() {
