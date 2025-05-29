@@ -21,12 +21,12 @@ class LibroTableModel extends AbstractTableModel {
     }
 
     public Libro getLibroAt(int rowIndex) {
-        return libreria.getLibri().get(rowIndex);
+        return libreria.getLibriDaVisualizzare().get(rowIndex);
     }
 
     @Override
     public int getRowCount() {
-        return libreria.getLibri().size();
+        return libreria.getLibriDaVisualizzare().size();
     }
 
     @Override
@@ -41,7 +41,7 @@ class LibroTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        List<Libro> libri = libreria.getLibri();
+        List<Libro> libri = libreria.getLibriDaVisualizzare();
         Libro libro = libri.get(rowIndex);
         return switch (columnIndex) {
             case 0 -> libro.getTitolo();

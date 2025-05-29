@@ -1,12 +1,15 @@
 package view;
 
+import libreria.Libreria;
 import libreria.LibreriaLL;
 import libro.Libro;
 import libro.StatoLettura;
+import ricerca.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -15,12 +18,19 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LibreriaGUI extends JFrame {
+public class LibreriaGUI extends JFrame implements Observer{
     private JTable tabellaLibri;
     private LibroTableModel tableModel;
-    private JButton aggiungiBtn, modificaBtn, rimuoviBtn;
+    private JButton aggiungiBtn, modificaBtn, rimuoviBtn, ordinaBtn;
     private LibreriaLL libreria;
     private boolean nonMostrare = false;
+
+    //ricerca dei libri
+    private JButton ricercaBtn;
+    private JTextField campoRicerca;
+    private JComboBox<String> comboCriteri;
+    private LinkedList<Libro> risultatiRicerca;
+    private boolean ricercaAttiva = false;
 
     public LibreriaGUI() {
         super("Libreria");
@@ -30,7 +40,6 @@ public class LibreriaGUI extends JFrame {
         tabellaLibri = new JTable(tableModel);
         tabellaLibri.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(tabellaLibri);
-
 
         tabellaLibri.getColumnModel().getColumn(4).setPreferredWidth(80);
         tabellaLibri.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -43,7 +52,7 @@ public class LibreriaGUI extends JFrame {
         rimuoviBtn = new JButton("Rimuovi libro");
 
         aggiungiBtn.addActionListener(e -> mostraFormAggiunta());
-        modificaBtn.addActionListener(e -> mostraFormModifica());//TODO
+        modificaBtn.addActionListener(e -> mostraFormModifica());
         rimuoviBtn.addActionListener(e -> rimuoviLibroSelezionato());
 
         JPanel pannelloBottoni = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -55,10 +64,61 @@ public class LibreriaGUI extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
         add(pannelloBottoni, BorderLayout.SOUTH);
 
+        /*------------------------------------------------------------------------*/
+        //ricerca
+        campoRicerca = new JTextField(15);
+        comboCriteri = new JComboBox<>(new String[]{"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Stato lettura"});
+        comboCriteri.setSelectedItem("Titolo");
+        ricercaBtn = new JButton("Cerca");
+
+        JPanel pannelloRicerca = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        pannelloRicerca.add(new JLabel("Cerca:"));
+        pannelloRicerca.add(campoRicerca);
+        pannelloRicerca.add(comboCriteri);
+        pannelloRicerca.add(ricercaBtn);
+
+        add(pannelloRicerca, BorderLayout.NORTH);
+
+        ricercaBtn.addActionListener(e -> eseguiRicerca());
+
+        /*------------------------------------------------------------------------*/
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(700, 400);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void eseguiRicerca() {
+        String testo = campoRicerca.getText().trim();
+        if (testo.isEmpty()) {
+            libreria.ripristinaLibri();
+            update();
+            return;
+        }
+        String criterio = (String) comboCriteri.getSelectedItem();
+        switch (criterio) {
+            case "Titolo":
+                libreria.setMethod(new RicercaPerTitolo());
+                break;
+            case "Autore":
+                libreria.setMethod(new RicercaPerAutore());
+                break;
+            case "ISBN":
+                libreria.setMethod(new RicercaPerIsbn());
+                break;
+            case "Genere":
+                libreria.setMethod(new RicercaPerGenere());
+                break;
+            case "Valutazione":
+                libreria.setMethod(new RicercaPerValutazione());
+                break;
+            case "Stato lettura":
+                libreria.setMethod(new RicercaPerStatoLettura());
+                break;
+        }
+        libreria.ricercaLibri(testo);
+        update();
     }
 
     private void mostraFormModifica() {
@@ -70,10 +130,12 @@ public class LibreriaGUI extends JFrame {
             autoreField.setText(selezionato.getAutore());
             JTextField isbnField = new JTextField(15);
             isbnField.setText(selezionato.getIsbn());
+            isbnField.addKeyListener(new IntegerKeyListener());
             JTextField genereField = new JTextField(15);
             genereField.setText(selezionato.getGenere());
             JTextField valutazioneField = new JTextField(15);
             valutazioneField.setText(selezionato.getValutazione().toString());
+            valutazioneField.addKeyListener(new IntegerKeyListener());
             JComboBox<StatoLettura> statoCombo = new JComboBox<>(StatoLettura.values());
             statoCombo.setSelectedItem(selezionato.getStatoLettura());
 
@@ -103,7 +165,7 @@ public class LibreriaGUI extends JFrame {
                         .valutazione(Integer.parseInt(valutazioneField.getText()))
                         .build();
                 libreria.modificaLibro(selezionato, nuovo);
-                tableModel.aggiornaLibri();
+                update();
             }
         }else{
             mostraWarningMessaggio("Prima seleziona un libro");
@@ -114,6 +176,7 @@ public class LibreriaGUI extends JFrame {
         JTextField titoloField = new JTextField(15);
         JTextField autoreField = new JTextField(15);
         JTextField isbnField = new JTextField(15);
+        isbnField.addKeyListener(new IntegerKeyListener());
         JTextField genereField = new JTextField(15);
         JComboBox<StatoLettura> statoCombo = new JComboBox<>(StatoLettura.values());
 
@@ -143,7 +206,7 @@ public class LibreriaGUI extends JFrame {
                 mostraFormAggiunta();
             }else {
                 libreria.aggiungiLibro(nuovo);
-                tableModel.aggiornaLibri();
+                update();
             }
         }
     }
@@ -154,7 +217,7 @@ public class LibreriaGUI extends JFrame {
             Libro libro = tableModel.getLibroAt(selectedRow);
             if(mostraWarningRimozione(libro)){
                 libreria.rimuoviLibro(libro);
-                tableModel.aggiornaLibri();
+                update();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Seleziona un libro da rimuovere");
@@ -197,5 +260,10 @@ public class LibreriaGUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new LibreriaGUI());
+    }
+
+    @Override
+    public void update() {
+        tableModel.aggiornaLibri();
     }
 }

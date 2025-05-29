@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface RicercaMethod {
 
-    public default LinkedList<Libro> ricerca(List<Libro> libri, Object criterio){
+    public default LinkedList<Libro> ricerca(List<Libro> libri, String criterio){
         LinkedList<Libro> trovati = new LinkedList<>();
         for(Libro lib : libri)
             if(condition(lib, criterio))
@@ -15,5 +15,5 @@ public interface RicercaMethod {
         return trovati;
     }
 
-    public boolean condition(Libro libro, Object criterio);
+    public boolean condition(Libro libro, String criterio);
 }
