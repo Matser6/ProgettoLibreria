@@ -4,7 +4,7 @@ import libro.Libro;
 
 import java.util.LinkedList;
 
-public class RicercaPerTitolo implements RicercaMethod {
+public class RicercaPerTitolo extends AbstractRicerca {
 
     @Override
     public boolean condition(Libro libro, String criterio) {

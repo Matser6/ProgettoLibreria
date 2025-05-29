@@ -1,7 +1,8 @@
 package libreria;
 
 import libro.Libro;
-import ricerca.RicercaMethod;
+import ordinamento.Ordinamento;
+import ricerca.AbstractRicerca;
 
 import view.Observer;
 
@@ -10,9 +11,10 @@ import java.util.*;
 public class LibreriaLL implements Libreria {
 
     private List<Observer> observers;
-    private LinkedList<Libro> libriDaVisualizzare;
-    private LinkedList<Libro> libri;
-    private RicercaMethod ricercaMethod;
+    private Ordinamento ordinamento;
+    private List<Libro> libriDaVisualizzare;
+    private List<Libro> libri;
+    private AbstractRicerca ricercaMethod;
 
     public LibreriaLL() {
         libri = new LinkedList<>();
@@ -25,7 +27,7 @@ public class LibreriaLL implements Libreria {
         if(!libri.contains(l))
             throw new NoSuchElementException("Libro non presente");
         libri.remove(l);
-        ripristinaLibri();
+        libriDaVisualizzare.remove(l);
         return l;
     }
 
@@ -34,7 +36,7 @@ public class LibreriaLL implements Libreria {
         if(this.contieneLibro(l.getIsbn()))
             throw new IllegalArgumentException("è già presente un libro con codice:" + l.getIsbn());
         libri.add(l);
-        ripristinaLibri();
+        libriDaVisualizzare.add(l);
     }
 
     @Override
@@ -51,12 +53,13 @@ public class LibreriaLL implements Libreria {
     public void modificaLibro(Libro vecchio, Libro nuovo) throws IllegalArgumentException {
         int posizioneVecchio = libri.indexOf(vecchio);
         libri.remove(vecchio);
+        libriDaVisualizzare.remove(vecchio);
         if(this.contieneLibro(nuovo.getIsbn())) {
             libri.add(posizioneVecchio, vecchio);
             throw new IllegalArgumentException();
         }
         libri.add(posizioneVecchio, nuovo);
-        ripristinaLibri();
+        libriDaVisualizzare.add(posizioneVecchio, nuovo);
     }
 
     @Override
@@ -76,7 +79,22 @@ public class LibreriaLL implements Libreria {
         }
     }
 
-    public void setMethod(RicercaMethod ricercaMethod) {
+    public void ripristinaLibri(){
+        libriDaVisualizzare.clear();
+        for(Libro lib : libri) {
+            libriDaVisualizzare.add(lib);
+        }
+    }
+
+    public List<Libro> getLibriDaVisualizzare(){
+        return libriDaVisualizzare;
+    }
+
+    public List<Libro> getLibri() {
+        return libri;
+    }
+
+    public void setMethod(AbstractRicerca ricercaMethod) {
         this.ricercaMethod = ricercaMethod;
     }
 
@@ -84,17 +102,12 @@ public class LibreriaLL implements Libreria {
         libriDaVisualizzare = ricercaMethod.ricerca(libri, criterio);
     }
 
-    public void ripristinaLibri(){
-        libriDaVisualizzare = (LinkedList<Libro>) libri.clone();
+    public void setOrdinamento(Ordinamento ordinamento) {
+        this.ordinamento = ordinamento;
     }
 
-    public LinkedList<Libro> getLibriDaVisualizzare(){
-        return libriDaVisualizzare;
+    public void ordina(boolean crescente){
+         ordinamento.ordina(libriDaVisualizzare, crescente);
     }
-
-    public LinkedList<Libro> getLibri() {
-        return libri;
-    }
-
 
 }
