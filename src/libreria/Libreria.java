@@ -2,6 +2,7 @@ package libreria;
 
 import libro.Libro;
 
+import memento.LibreriaMemento;
 import view.Observer;
 
 import java.io.IOException;
@@ -27,6 +28,10 @@ public interface Libreria {
     public void salvaSuFile(String pathFile) throws IOException;
 
     public void caricaDaFile(String pathFile) throws IOException;
+
+    public LibreriaMemento salvaStato();
+
+    public void ripristinaStato(LibreriaMemento memento);
 
 }
 

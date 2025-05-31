@@ -1,6 +1,7 @@
 package libreria;
 
 import libro.Libro;
+import memento.LibreriaMemento;
 import ordinamento.Ordinamento;
 import ricerca.AbstractRicerca;
 
@@ -139,6 +140,18 @@ public final class LibreriaLL implements Libreria {
         notifyObservers();
     }
 
+    @Override
+    public LibreriaMemento salvaStato() {
+        return new LibreriaMemento(libri);
+    }
+
+    @Override
+    public void ripristinaStato(LibreriaMemento memento) {
+        libri = memento.getStatoLibri();
+        ripristinaLibriDaVisualizzare();
+        notifyObservers();
+    }
+
     public void ripristinaLibriDaVisualizzare(){
         libriDaVisualizzare.clear();
         for(Libro lib : libri) {
@@ -172,7 +185,4 @@ public final class LibreriaLL implements Libreria {
          ordinamento.ordina(libriDaVisualizzare, crescente);
          notifyObservers();
     }
-
-
-
 }

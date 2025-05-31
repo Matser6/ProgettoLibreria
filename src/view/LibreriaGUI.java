@@ -3,6 +3,7 @@ package view;
 import libreria.LibreriaLL;
 import libro.Libro;
 import libro.StatoLettura;
+import memento.LibreriaMemento;
 import ordinamento.OrdinaPerTitolo;
 import ordinamento.OrdinamentoPerValutazione;
 import ricerca.*;
@@ -10,29 +11,29 @@ import ricerca.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Stack;
 
-public class LibreriaGUI extends JFrame implements Observer{
+public class LibreriaGUI extends JFrame {
     private JTable tabellaLibri;
     private LibroTableModel tableModel;
-    private JButton aggiungiBtn, modificaBtn, rimuoviBtn;
     private LibreriaLL libreria;
     private boolean nonMostrare = false;
+    private String pathDelFile = "";
+    private Stack<LibreriaMemento> history = new Stack<>();
 
     //ricerca dei libri
-    private JButton ricercaBtn;
     private JTextField campoRicerca;
     private JComboBox<String> comboCriteriRicerca;
 
     //ordinamento dei libri
-    private JButton ordinaBtn;
     private JComboBox<String> comboCriteriOrdinamento, comboOrdine;
 
     public LibreriaGUI() {
         super("Libreria");
 
         libreria = LibreriaLL.getIstance();
-        libreria.registerObserver(this);
         tableModel = new LibroTableModel(libreria);
+        libreria.registerObserver(tableModel);
         tabellaLibri = new JTable(tableModel);
         tabellaLibri.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scrollPane = new JScrollPane(tabellaLibri);
@@ -46,9 +47,9 @@ public class LibreriaGUI extends JFrame implements Observer{
         //bottoni barra inferiore sinistra
         JPanel pannelloAggiunta = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        aggiungiBtn = new JButton("Aggiungi libro");
-        modificaBtn = new JButton("Modifica libro");
-        rimuoviBtn = new JButton("Rimuovi libro");
+        JButton aggiungiBtn = new JButton("Aggiungi libro");
+        JButton modificaBtn = new JButton("Modifica libro");
+        JButton rimuoviBtn = new JButton("Rimuovi libro");
 
         pannelloAggiunta.add(aggiungiBtn);
         pannelloAggiunta.add(modificaBtn);
@@ -87,7 +88,7 @@ public class LibreriaGUI extends JFrame implements Observer{
         campoRicerca = new JTextField(15);
         comboCriteriRicerca = new JComboBox<>(new String[]{"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Stato lettura"});
         comboCriteriRicerca.setSelectedItem("Titolo");
-        ricercaBtn = new JButton("Cerca");
+        JButton ricercaBtn = new JButton("Cerca");
 
         JPanel pannelloRicerca = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         pannelloRicerca.add(new JLabel("Cerca:"));
@@ -101,7 +102,7 @@ public class LibreriaGUI extends JFrame implements Observer{
         //ordinamento
         comboCriteriOrdinamento = new JComboBox<>(new String[]{"Di inserimento", "Titolo", "Valutazione"});
         comboOrdine = new JComboBox<>(new String[]{"Crescente", "Decrescente"});
-        ordinaBtn = new JButton("Ordina");
+        JButton ordinaBtn = new JButton("Ordina");
 
         JPanel pannelloOrdinamento = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pannelloOrdinamento.add(new JLabel("Ordina per:"));
@@ -126,12 +127,12 @@ public class LibreriaGUI extends JFrame implements Observer{
         JButton nuovaLibreriaBtn = new JButton("Nuova libreria");
         JButton caricaLibreriaBtn = new JButton("Carica libreria");
         JButton salvaLibreriaBtn = new JButton("Salva");
-        JButton SalvaLibreriaSuFileBtn = new JButton("Salva su file");
+        JButton salvaConNomeBtn = new JButton("Salva con nome");
 
         inizializePanel.add(nuovaLibreriaBtn);
         inizializePanel.add(caricaLibreriaBtn);
         inizializePanel.add(salvaLibreriaBtn);
-        inizializePanel.add(SalvaLibreriaSuFileBtn);
+        inizializePanel.add(salvaConNomeBtn);
 
         nuovaLibreriaBtn.addActionListener(e -> nuovaLibreria());
         caricaLibreriaBtn.addActionListener(e -> {
@@ -141,7 +142,8 @@ public class LibreriaGUI extends JFrame implements Observer{
                 throw new RuntimeException(ex);
             }
         });
-        SalvaLibreriaSuFileBtn.addActionListener(e -> {
+        salvaLibreriaBtn.addActionListener(e -> salvaStatoLibreria());
+        salvaConNomeBtn.addActionListener(e -> {
             try {
                 salvaLibreriaSuFile();
             } catch (IOException ex) {
@@ -154,16 +156,15 @@ public class LibreriaGUI extends JFrame implements Observer{
         JPanel undoRedoPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         JButton undoBtn = new JButton("<--");
-        JButton redoBtn = new JButton("-->");
         undoRedoPanel.add(undoBtn);
-        undoRedoPanel.add(redoBtn);
+        
+        undoBtn.addActionListener(e -> undo());
 
         /*-----------------------------------------------------------------*/
         //pannello contenitore nord
         JPanel pannelloSuperioreNord = new JPanel(new BorderLayout());
         pannelloSuperioreNord.add(inizializePanel, BorderLayout.WEST);
         pannelloSuperioreNord.add(undoRedoPanel, BorderLayout.EAST);
-
         /*----------------------------------------------------------------------*/
         //pannello contenitore totale
         JPanel containerTop = new JPanel(new BorderLayout());
@@ -176,6 +177,18 @@ public class LibreriaGUI extends JFrame implements Observer{
         setSize(1000, 600);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void undo() {
+        if(!history.isEmpty()) {
+            libreria.ripristinaStato(history.pop());
+        } else {
+            mostraWarningMessaggio("Non ci sono azioni da annullare");
+        }
+    }
+
+    private void salvaStatoLibreria() {
+        history.push(libreria.salvaStato());
     }
 
     private void aggiungiValutazione() {
@@ -251,24 +264,23 @@ public class LibreriaGUI extends JFrame implements Observer{
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Carica libreria da file", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            libreria.caricaDaFile(pathField.getText());
+            pathDelFile = pathField.getText();
+            libreria.caricaDaFile(pathDelFile);
         }
     }
 
     private void salvaLibreriaSuFile() throws IOException {
         JTextField pathField = new JTextField(15);
-        JTextField nomeFileField = new JTextField(15);
+        pathField.setText(pathDelFile);
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Path:"));
         panel.add(pathField);
-        panel.add(new JLabel("Nome file:"));
-        panel.add(nomeFileField);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Salva libreria su file", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            String s = pathField.getText()+nomeFileField.getText();
-            libreria.salvaSuFile(s);
+            pathDelFile = pathField.getText();
+            libreria.salvaSuFile(pathDelFile);
         }
     }
 
@@ -451,11 +463,6 @@ public class LibreriaGUI extends JFrame implements Observer{
             return false;
         }
         return true;
-    }
-
-    @Override
-    public void update() {
-        tableModel.aggiornaLibri();
     }
 
     public static void main(String[] args) {

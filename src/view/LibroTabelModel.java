@@ -4,11 +4,9 @@ import libreria.LibreriaLL;
 import libro.Libro;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-class LibroTableModel extends AbstractTableModel {
+class LibroTableModel extends AbstractTableModel implements Observer {
     private final String[] colonne = {"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Pagina", "Stato Lettura"};
     private final LibreriaLL libreria;
 
@@ -16,7 +14,8 @@ class LibroTableModel extends AbstractTableModel {
         this.libreria = libreria;
     }
 
-    public void aggiornaLibri(){
+    @Override
+    public void update(){
         fireTableDataChanged();
     }
 
