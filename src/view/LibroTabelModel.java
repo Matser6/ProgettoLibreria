@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class LibroTableModel extends AbstractTableModel {
-    private final String[] colonne = {"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Stato Lettura"};
+    private final String[] colonne = {"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Pagina", "Stato Lettura"};
     private final LibreriaLL libreria;
 
     public LibroTableModel(LibreriaLL libreria) {
@@ -49,7 +49,8 @@ class LibroTableModel extends AbstractTableModel {
             case 2 -> libro.getIsbn();
             case 3 -> libro.getGenere();
             case 4 -> libro.getValutazione();
-            case 5 -> libro.getStatoLettura();
+            case 5 -> libro.getSegnaPagina();
+            case 6 -> libro.getStatoLettura();
             default -> null;
         };
     }

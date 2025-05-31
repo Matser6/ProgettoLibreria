@@ -1,12 +1,17 @@
 package libro;
 
-public class Libro {
+import java.io.Serializable;
+
+public class Libro implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private final String titolo;
     private final String autore;
     private final String isbn;
     private final String genere;
-    private final Integer valutazione;
-    private final Integer segnaPagina;
+    private Integer valutazione;
+    private Integer segnaPagina;
     private final StatoLettura statoLettura;
 
     public static class BuilderLibro {
@@ -63,8 +68,16 @@ public class Libro {
         return valutazione;
     }
 
+    public void setValutazione(Integer valutazione) {
+        this.valutazione = valutazione;
+    }
+
     public Integer getSegnaPagina() {
         return segnaPagina;
+    }
+
+    public void setSegnaPagina(Integer segnaPagina) {
+        this.segnaPagina = segnaPagina;
     }
 
     public StatoLettura getStatoLettura() {

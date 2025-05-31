@@ -4,6 +4,8 @@ import libro.Libro;
 
 import view.Observer;
 
+import java.io.IOException;
+
 public interface Libreria {
 
     public Libro rimuoviLibro(Libro l);
@@ -14,11 +16,17 @@ public interface Libreria {
 
     public void modificaLibro(Libro vecchio, Libro nuovo);
 
+    public void svuotaLibreria();
+
     public void registerObserver(Observer o);
 
     public void removeObserver(Observer o);
 
     public void notifyObservers();
+
+    public void salvaSuFile(String pathFile) throws IOException;
+
+    public void caricaDaFile(String pathFile) throws IOException;
 
 }
 

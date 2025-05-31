@@ -6,9 +6,12 @@ import ricerca.AbstractRicerca;
 
 import view.Observer;
 
+import java.io.*;
 import java.util.*;
 
-public class LibreriaLL implements Libreria {
+public final class LibreriaLL implements Libreria {
+
+    private static LibreriaLL instance = null;
 
     private List<Observer> observers;
     private Ordinamento ordinamento;
@@ -16,10 +19,17 @@ public class LibreriaLL implements Libreria {
     private List<Libro> libri;
     private AbstractRicerca ricercaMethod;
 
-    public LibreriaLL() {
+    private LibreriaLL() {
         libri = new LinkedList<>();
         libriDaVisualizzare = new LinkedList<>();
         observers = new LinkedList<>();
+    }
+
+    public static synchronized LibreriaLL getIstance() {
+        if(instance == null) {
+            instance = new LibreriaLL();
+        }
+        return instance;
     }
 
     @Override
@@ -28,6 +38,7 @@ public class LibreriaLL implements Libreria {
             throw new NoSuchElementException("Libro non presente");
         libri.remove(l);
         libriDaVisualizzare.remove(l);
+        notifyObservers();
         return l;
     }
 
@@ -37,6 +48,7 @@ public class LibreriaLL implements Libreria {
             throw new IllegalArgumentException("è già presente un libro con codice:" + l.getIsbn());
         libri.add(l);
         libriDaVisualizzare.add(l);
+        notifyObservers();
     }
 
     @Override
@@ -60,6 +72,24 @@ public class LibreriaLL implements Libreria {
         }
         libri.add(posizioneVecchio, nuovo);
         libriDaVisualizzare.add(posizioneVecchio, nuovo);
+        notifyObservers();
+    }
+
+    public void modificaValutazione(Libro l, Integer valutazione) {
+        l.setValutazione(valutazione);
+        notifyObservers();
+    }
+
+    public void spostaSegnalibro(Libro l, Integer pagina) {
+        l.setSegnaPagina(pagina);
+        notifyObservers();
+    }
+
+    @Override
+    public void svuotaLibreria() {
+        libri.clear();
+        libriDaVisualizzare.clear();
+        notifyObservers();
     }
 
     @Override
@@ -79,11 +109,42 @@ public class LibreriaLL implements Libreria {
         }
     }
 
-    public void ripristinaLibri(){
+    @Override
+    public void salvaSuFile(String pathFile) throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(pathFile));
+        for(Libro l : libri){
+            oos.writeObject(l);
+        }
+        oos.close();
+    }
+
+    @Override
+    public void caricaDaFile(String pathFile) throws IOException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(pathFile));
+        libri.clear();
+        Libro libro;
+        for(;;) {
+            try {
+                libro = (Libro) ois.readObject();
+            } catch(ClassNotFoundException e) {
+                throw new IOException(e);
+            } catch (ClassCastException e) {
+                throw new IOException(e);
+            } catch (EOFException e) {
+                break;
+            }
+            this.aggiungiLibro(libro);
+        }
+        ois.close();
+        notifyObservers();
+    }
+
+    public void ripristinaLibriDaVisualizzare(){
         libriDaVisualizzare.clear();
         for(Libro lib : libri) {
             libriDaVisualizzare.add(lib);
         }
+        notifyObservers();
     }
 
     public List<Libro> getLibriDaVisualizzare(){
@@ -100,6 +161,7 @@ public class LibreriaLL implements Libreria {
 
     public void ricercaLibri(String criterio) {
         libriDaVisualizzare = ricercaMethod.ricerca(libri, criterio);
+        notifyObservers();
     }
 
     public void setOrdinamento(Ordinamento ordinamento) {
@@ -108,6 +170,9 @@ public class LibreriaLL implements Libreria {
 
     public void ordina(boolean crescente){
          ordinamento.ordina(libriDaVisualizzare, crescente);
+         notifyObservers();
     }
+
+
 
 }

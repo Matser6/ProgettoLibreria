@@ -1,6 +1,8 @@
 package libro;
 
-public enum StatoLettura {
+import java.io.Serializable;
+
+public enum StatoLettura implements Serializable {
     LETTO,
     IN_LETTURA,
     DA_LEGGERE;
