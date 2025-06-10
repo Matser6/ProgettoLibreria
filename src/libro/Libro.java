@@ -1,6 +1,7 @@
 package libro;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Libro implements Serializable {
 
@@ -25,11 +26,15 @@ public class Libro implements Serializable {
         private Integer segnaPagina = 0;
 
         public BuilderLibro(String titolo, String autore, String isbn, String genere, StatoLettura statoLettura) {
-            this.titolo = titolo;
-            this.autore = autore;
-            this.isbn = isbn;
-            this.genere = genere;
-            this.statoLettura = statoLettura;
+            if(!(titolo.isEmpty() || autore.isEmpty() || isbn.isEmpty() || genere.isEmpty() || statoLettura == null)) {
+                this.titolo = titolo;
+                this.autore = autore;
+                this.isbn = isbn;
+                this.genere = genere;
+                this.statoLettura = statoLettura;
+            } else {
+                throw new IllegalArgumentException("i campi: titolo, autore, isbn, genere, statoLettura non possono essere vuoti");
+            }
         }
 
         public BuilderLibro valutazione(Integer valutazione) { this.valutazione = valutazione; return this; }

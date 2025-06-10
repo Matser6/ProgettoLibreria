@@ -2,7 +2,7 @@ package libreria;
 
 import libro.Libro;
 import memento.LibreriaMemento;
-import ordinamento.Ordinamento;
+import ordinamento.AbstractOrdinamento;
 import ricerca.AbstractRicerca;
 
 import view.Observer;
@@ -15,7 +15,7 @@ public final class LibreriaLL implements Libreria {
     private static LibreriaLL instance = null;
 
     private List<Observer> observers;
-    private Ordinamento ordinamento;
+    private AbstractOrdinamento ordinamento;
     private List<Libro> libriDaVisualizzare;
     private List<Libro> libri;
     private AbstractRicerca ricercaMethod;
@@ -177,7 +177,7 @@ public final class LibreriaLL implements Libreria {
         notifyObservers();
     }
 
-    public void setOrdinamento(Ordinamento ordinamento) {
+    public void setOrdinamento(AbstractOrdinamento ordinamento) {
         this.ordinamento = ordinamento;
     }
 

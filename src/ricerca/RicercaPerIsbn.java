@@ -6,6 +6,6 @@ public class RicercaPerIsbn extends AbstractRicerca {
 
     @Override
     public boolean condition(Libro libro, String criterio) {
-        return libro.getIsbn().contains(criterio);
+        return libro.getIsbn().toLowerCase().contains(criterio.toLowerCase());
     }
 }

@@ -3,15 +3,17 @@ package ordinamento;
 import libro.Libro;
 
 import java.util.Comparator;
-import java.util.List;
 
-public class OrdinaPerTitolo implements Ordinamento{
+public class OrdinaPerTitolo extends AbstractOrdinamento{
+
     @Override
-    public void ordina(List<Libro> fonte,  boolean crescente) {
-        if(crescente)
-            fonte.sort(new ComparatorePerTitolo());
-        else
-            fonte.sort(new ComparatorePerTitolo().reversed());
+    public Comparator<Libro> getComparatore() {
+        return new ComparatorePerTitolo();
+    }
+
+    @Override
+    public Comparator<Libro> getComparatoreReversed() {
+        return new ComparatorePerTitolo().reversed();
     }
 
     public class ComparatorePerTitolo implements Comparator<Libro> {

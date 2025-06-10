@@ -5,13 +5,17 @@ import libro.Libro;
 import java.util.Comparator;
 import java.util.List;
 
-public class OrdinamentoPerValutazione implements Ordinamento{
+public class OrdinamentoPerValutazione extends AbstractOrdinamento{
+
+
     @Override
-    public void ordina(List<Libro> fonte, boolean crescente) {
-        if(crescente)
-            fonte.sort(new ComparatorePerValutazione());
-        else
-            fonte.sort(new ComparatorePerValutazione().reversed());
+    public Comparator<Libro> getComparatore() {
+        return new ComparatorePerValutazione();
+    }
+
+    @Override
+    public Comparator<Libro> getComparatoreReversed() {
+        return new ComparatorePerValutazione().reversed();
     }
 
     public class ComparatorePerValutazione implements Comparator<Libro> {

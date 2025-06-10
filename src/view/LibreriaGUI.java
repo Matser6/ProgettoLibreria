@@ -126,12 +126,10 @@ public class LibreriaGUI extends JFrame {
 
         JButton nuovaLibreriaBtn = new JButton("Nuova libreria");
         JButton caricaLibreriaBtn = new JButton("Carica libreria");
-        JButton salvaLibreriaBtn = new JButton("Salva");
         JButton salvaConNomeBtn = new JButton("Salva con nome");
 
         inizializePanel.add(nuovaLibreriaBtn);
         inizializePanel.add(caricaLibreriaBtn);
-        inizializePanel.add(salvaLibreriaBtn);
         inizializePanel.add(salvaConNomeBtn);
 
         nuovaLibreriaBtn.addActionListener(e -> nuovaLibreria());
@@ -142,7 +140,6 @@ public class LibreriaGUI extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
-        salvaLibreriaBtn.addActionListener(e -> salvaStatoLibreria());
         salvaConNomeBtn.addActionListener(e -> {
             try {
                 salvaLibreriaSuFile();
@@ -218,7 +215,7 @@ public class LibreriaGUI extends JFrame {
 
     private void spostaSegnalibro(){
         Libro selezionato = selezionaLibro();
-        if(selezionato != null) {
+        if(selezionato != null && selezionato.getStatoLettura().equals(StatoLettura.IN_LETTURA)) {
             JTextField segnalibroField = new JTextField(15);
             segnalibroField.addKeyListener(new IntegerKeyListener());
             JPanel panel = new JPanel(new GridLayout(0, 1));
@@ -234,7 +231,7 @@ public class LibreriaGUI extends JFrame {
                 }
             }
         } else {
-            mostraWarningMessaggio("Prima seleziona un libro");
+            mostraWarningMessaggio("Prima seleziona un libro in lettura");
         }
     }
 
@@ -265,7 +262,9 @@ public class LibreriaGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, panel, "Carica libreria da file", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             pathDelFile = pathField.getText();
+            salvaStatoLibreria();
             libreria.caricaDaFile(pathDelFile);
+
         }
     }
 
@@ -343,9 +342,6 @@ public class LibreriaGUI extends JFrame {
             isbnField.addKeyListener(new IntegerKeyListener());
             JTextField genereField = new JTextField(15);
             genereField.setText(selezionato.getGenere());
-            JTextField valutazioneField = new JTextField(15);
-            valutazioneField.setText(selezionato.getValutazione().toString());
-            valutazioneField.addKeyListener(new IntegerKeyListener());
             JComboBox<StatoLettura> statoCombo = new JComboBox<>(StatoLettura.values());
             statoCombo.setSelectedItem(selezionato.getStatoLettura());
 
@@ -358,24 +354,27 @@ public class LibreriaGUI extends JFrame {
             panel.add(isbnField);
             panel.add(new JLabel("Genere:"));
             panel.add(genereField);
-            panel.add(new JLabel("Valutazione:"));
-            panel.add(valutazioneField);
             panel.add(new JLabel("Stato Lettura:"));
             panel.add(statoCombo);
 
             int result = JOptionPane.showConfirmDialog(this, panel, "Modifica libro", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                Libro nuovo = new Libro.BuilderLibro(
-                        titoloField.getText(),
-                        autoreField.getText(),
-                        isbnField.getText(),
-                        genereField.getText(),
-                        (StatoLettura) statoCombo.getSelectedItem()
-                )
-                        .valutazione(Integer.parseInt(valutazioneField.getText()))
-                        .build();
-                libreria.modificaLibro(selezionato, nuovo);
-
+                if(titoloField.getText().equals("") || autoreField.getText().equals("") || isbnField.getText().equals("") || genereField.getText().equals("")) {
+                    mostraWarningMessaggio("titolo, autore, isbn e genere non possono essere vuoti");
+                    mostraFormModifica();
+                } else {
+                    Libro nuovo = new Libro.BuilderLibro(
+                            titoloField.getText(),
+                            autoreField.getText(),
+                            isbnField.getText(),
+                            genereField.getText(),
+                            (StatoLettura) statoCombo.getSelectedItem()
+                    )
+                            .valutazione(selezionato.getValutazione())
+                            .build();
+                    salvaStatoLibreria();
+                    libreria.modificaLibro(selezionato, nuovo);
+                }
             }
         }else{
             mostraWarningMessaggio("Prima seleziona un libro");
@@ -404,18 +403,24 @@ public class LibreriaGUI extends JFrame {
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Nuovo Libro", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            Libro nuovo = new Libro.BuilderLibro(
-                    titoloField.getText(),
-                    autoreField.getText(),
-                    isbnField.getText(),
-                    genereField.getText(),
-                    (StatoLettura) statoCombo.getSelectedItem()
-            ).build();
-            if(libreria.contieneLibro(nuovo.getIsbn())) {
-                mostraWarningMessaggio("Libro già presente! Controlla isbn");
+            if(titoloField.getText().equals("") || autoreField.getText().equals("") || isbnField.getText().equals("") || genereField.getText().equals("")) {
+                mostraWarningMessaggio("titolo, autore, isbn e genere non possono essere vuoti");
                 mostraFormAggiunta();
-            }else {
-                libreria.aggiungiLibro(nuovo);
+            } else {
+                Libro nuovo = new Libro.BuilderLibro(
+                        titoloField.getText(),
+                        autoreField.getText(),
+                        isbnField.getText(),
+                        genereField.getText(),
+                        (StatoLettura) statoCombo.getSelectedItem()
+                ).build();
+                if(libreria.contieneLibro(nuovo.getIsbn())) {
+                    mostraWarningMessaggio("Libro già presente! Controlla isbn");
+                    mostraFormAggiunta();
+                }else {
+                    salvaStatoLibreria();
+                    libreria.aggiungiLibro(nuovo);
+                }
             }
         }
     }
@@ -424,6 +429,7 @@ public class LibreriaGUI extends JFrame {
         Libro selezionato = selezionaLibro();
         if (selezionato != null) {
             if(mostraWarningRimozione(selezionato)){
+                salvaStatoLibreria();
                 libreria.rimuoviLibro(selezionato);
             }
         } else {
