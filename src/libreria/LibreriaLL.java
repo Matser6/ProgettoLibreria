@@ -46,7 +46,7 @@ public final class LibreriaLL implements Libreria {
     @Override
     public void aggiungiLibro(Libro l) throws IllegalArgumentException {
         if(this.contieneLibro(l.getIsbn()))
-            throw new IllegalArgumentException("è già presente un libro con codice:" + l.getIsbn());
+            throw new IllegalArgumentException("è già presente un libro con ISBN= " + l.getIsbn());
         libri.add(l);
         libriDaVisualizzare.add(l);
         notifyObservers();
@@ -66,23 +66,39 @@ public final class LibreriaLL implements Libreria {
     public void modificaLibro(Libro vecchio, Libro nuovo) throws IllegalArgumentException {
         int posizioneVecchio = libri.indexOf(vecchio);
         libri.remove(vecchio);
-        libriDaVisualizzare.remove(vecchio);
         if(this.contieneLibro(nuovo.getIsbn())) {
             libri.add(posizioneVecchio, vecchio);
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("è già presente un libro con ISBN= " + nuovo.getIsbn());
         }
         libri.add(posizioneVecchio, nuovo);
+        libriDaVisualizzare.remove(vecchio);
         libriDaVisualizzare.add(posizioneVecchio, nuovo);
         notifyObservers();
     }
 
     public void modificaValutazione(Libro l, Integer valutazione) {
-        l.setValutazione(valutazione);
+        int val;
+        if(valutazione > 10){
+            val = 10;
+        } else if (valutazione < 1) {
+            val = 1;
+        } else {
+            val = valutazione;
+        }
+        Libro nuovo = new Libro.BuilderLibro(l).valutazione(val).segnaPagina(l.getSegnaPagina()).build();
+        modificaLibro(l, nuovo);
         notifyObservers();
     }
 
     public void spostaSegnalibro(Libro l, Integer pagina) {
-        l.setSegnaPagina(pagina);
+        int pag;
+        if (pagina < 1) {
+            pag = 1;
+        } else {
+            pag = pagina;
+        }
+        Libro nuovo = new Libro.BuilderLibro(l).valutazione(l.getValutazione()).segnaPagina(pag).build();
+        modificaLibro(l, nuovo);
         notifyObservers();
     }
 
@@ -122,7 +138,7 @@ public final class LibreriaLL implements Libreria {
     @Override
     public void caricaDaFile(String pathFile) throws IOException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(pathFile));
-        libri.clear();
+        svuotaLibreria();
         Libro libro;
         for(;;) {
             try {

@@ -26,15 +26,23 @@ public class Libro implements Serializable {
         private Integer segnaPagina = 0;
 
         public BuilderLibro(String titolo, String autore, String isbn, String genere, StatoLettura statoLettura) {
-            if(!(titolo.isEmpty() || autore.isEmpty() || isbn.isEmpty() || genere.isEmpty() || statoLettura == null)) {
+            if(!(titolo.isEmpty() || autore.isEmpty() || isbn.isEmpty() || genere.isEmpty())) {
                 this.titolo = titolo;
                 this.autore = autore;
                 this.isbn = isbn;
                 this.genere = genere;
                 this.statoLettura = statoLettura;
             } else {
-                throw new IllegalArgumentException("i campi: titolo, autore, isbn, genere, statoLettura non possono essere vuoti");
+                throw new IllegalArgumentException("i campi: titolo, autore, isbn e genere non possono essere vuoti");
             }
+        }
+
+        public BuilderLibro(Libro libro) {
+            this.titolo = libro.titolo;
+            this.autore = libro.autore;
+            this.isbn = libro.isbn;
+            this.genere = libro.genere;
+            this.statoLettura = libro.statoLettura;
         }
 
         public BuilderLibro valutazione(Integer valutazione) { this.valutazione = valutazione; return this; }

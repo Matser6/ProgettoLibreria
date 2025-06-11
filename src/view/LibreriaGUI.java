@@ -198,13 +198,12 @@ public class LibreriaGUI extends JFrame {
             panel.add(valutazioneField);
             int result = JOptionPane.showConfirmDialog(this, panel, "Aggiungi una valutazione", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                Integer valutazione = Integer.parseInt(valutazioneField.getText());
-                if(valutazione > 10){
-                    libreria.modificaValutazione(selezionato,10);
-                } else if (valutazione < 1) {
-                    libreria.modificaValutazione(selezionato,1);
-                } else {
+                if(!valutazioneField.getText().isEmpty()){
+                    salvaStatoLibreria();
+                    Integer valutazione = Integer.parseInt(valutazioneField.getText());
                     libreria.modificaValutazione(selezionato, valutazione);
+                } else {
+                    mostraWarningMessaggio("Il campo è vuoto");
                 }
             }
         } else {
@@ -223,11 +222,12 @@ public class LibreriaGUI extends JFrame {
             panel.add(segnalibroField);
             int result = JOptionPane.showConfirmDialog(this, panel, "Sposta il segnalibro", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                Integer pagina = Integer.parseInt(segnalibroField.getText());
-                if (pagina < 1) {
-                    libreria.spostaSegnalibro(selezionato,1);
-                } else {
+                if(!segnalibroField.getText().isEmpty()){
+                    Integer pagina = Integer.parseInt(segnalibroField.getText());
+                    salvaStatoLibreria();
                     libreria.spostaSegnalibro(selezionato, pagina);
+                } else {
+                    mostraWarningMessaggio("Il campo è vuoto");
                 }
             }
         } else {
@@ -262,9 +262,11 @@ public class LibreriaGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, panel, "Carica libreria da file", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             pathDelFile = pathField.getText();
-            salvaStatoLibreria();
-            libreria.caricaDaFile(pathDelFile);
-
+            try {
+                libreria.caricaDaFile(pathDelFile);
+            } catch (IOException e) {
+                mostraWarningMessaggio("percorso file non valido o file inesistente");
+            }
         }
     }
 
@@ -279,7 +281,11 @@ public class LibreriaGUI extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, panel, "Salva libreria su file", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             pathDelFile = pathField.getText();
-            libreria.salvaSuFile(pathDelFile);
+            try {
+                libreria.salvaSuFile(pathDelFile);
+            } catch (IOException e) {
+                mostraWarningMessaggio("percorso non valido ");
+            }
         }
     }
 
@@ -359,10 +365,7 @@ public class LibreriaGUI extends JFrame {
 
             int result = JOptionPane.showConfirmDialog(this, panel, "Modifica libro", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                if(titoloField.getText().equals("") || autoreField.getText().equals("") || isbnField.getText().equals("") || genereField.getText().equals("")) {
-                    mostraWarningMessaggio("titolo, autore, isbn e genere non possono essere vuoti");
-                    mostraFormModifica();
-                } else {
+                try {
                     Libro nuovo = new Libro.BuilderLibro(
                             titoloField.getText(),
                             autoreField.getText(),
@@ -374,6 +377,9 @@ public class LibreriaGUI extends JFrame {
                             .build();
                     salvaStatoLibreria();
                     libreria.modificaLibro(selezionato, nuovo);
+                } catch(IllegalArgumentException e) {
+                    mostraWarningMessaggio(e.getMessage());
+                    mostraFormModifica();
                 }
             }
         }else{
@@ -403,10 +409,7 @@ public class LibreriaGUI extends JFrame {
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Nuovo Libro", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
-            if(titoloField.getText().equals("") || autoreField.getText().equals("") || isbnField.getText().equals("") || genereField.getText().equals("")) {
-                mostraWarningMessaggio("titolo, autore, isbn e genere non possono essere vuoti");
-                mostraFormAggiunta();
-            } else {
+            try {
                 Libro nuovo = new Libro.BuilderLibro(
                         titoloField.getText(),
                         autoreField.getText(),
@@ -414,13 +417,11 @@ public class LibreriaGUI extends JFrame {
                         genereField.getText(),
                         (StatoLettura) statoCombo.getSelectedItem()
                 ).build();
-                if(libreria.contieneLibro(nuovo.getIsbn())) {
-                    mostraWarningMessaggio("Libro già presente! Controlla isbn");
-                    mostraFormAggiunta();
-                }else {
-                    salvaStatoLibreria();
-                    libreria.aggiungiLibro(nuovo);
-                }
+                salvaStatoLibreria();
+                libreria.aggiungiLibro(nuovo);
+            } catch (IllegalArgumentException e){
+                mostraWarningMessaggio(e.getMessage());
+                mostraFormAggiunta();
             }
         }
     }
