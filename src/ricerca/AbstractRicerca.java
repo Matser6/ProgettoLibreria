@@ -16,6 +16,4 @@ public abstract class AbstractRicerca {
     }
 
     public abstract boolean condition(Libro libro, String criterio);
-
-
 }

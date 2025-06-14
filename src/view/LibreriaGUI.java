@@ -1,5 +1,6 @@
 package view;
 
+import libreria.Libreria;
 import libreria.LibreriaLL;
 import libro.Libro;
 import libro.StatoLettura;

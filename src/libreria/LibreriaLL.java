@@ -10,20 +10,19 @@ import view.Observer;
 import java.io.*;
 import java.util.*;
 
-public final class LibreriaLL implements Libreria {
+public final class LibreriaLL extends AbstractLibreria {
 
     private static LibreriaLL instance = null;
 
-    private List<Observer> observers;
     private AbstractOrdinamento ordinamento;
     private List<Libro> libriDaVisualizzare;
     private List<Libro> libri;
     private AbstractRicerca ricercaMethod;
 
     private LibreriaLL() {
-        libri = new LinkedList<>();
-        libriDaVisualizzare = new LinkedList<>();
-        observers = new LinkedList<>();
+        super();
+        libri = new ArrayList<>();
+        libriDaVisualizzare = new ArrayList<>();
     }
 
     public static synchronized LibreriaLL getIstance() {
@@ -53,16 +52,6 @@ public final class LibreriaLL implements Libreria {
     }
 
     @Override
-    public boolean contieneLibro(String isbn) {
-        for(Libro lib : libri) {
-            if(lib.getIsbn().equals(isbn)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void modificaLibro(Libro vecchio, Libro nuovo) throws IllegalArgumentException {
         int posizioneVecchio = libri.indexOf(vecchio);
         libri.remove(vecchio);
@@ -74,6 +63,16 @@ public final class LibreriaLL implements Libreria {
         libriDaVisualizzare.remove(vecchio);
         libriDaVisualizzare.add(posizioneVecchio, nuovo);
         notifyObservers();
+    }
+
+    @Override
+    public boolean contieneLibro(String isbn){
+        for(Libro lib : libri) {
+            if(lib.getIsbn().equals(isbn)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void modificaValutazione(Libro l, Integer valutazione) {
@@ -107,23 +106,6 @@ public final class LibreriaLL implements Libreria {
         libri.clear();
         libriDaVisualizzare.clear();
         notifyObservers();
-    }
-
-    @Override
-    public void registerObserver(Observer o) {
-        observers.add(o);
-    }
-
-    @Override
-    public void removeObserver(Observer o) {
-        observers.remove(o);
-    }
-
-    @Override
-    public void notifyObservers() {
-        for(Observer o : observers) {
-            o.update();
-        }
     }
 
     @Override
@@ -178,10 +160,6 @@ public final class LibreriaLL implements Libreria {
 
     public List<Libro> getLibriDaVisualizzare(){
         return libriDaVisualizzare;
-    }
-
-    public List<Libro> getLibri() {
-        return libri;
     }
 
     public void setMethod(AbstractRicerca ricercaMethod) {

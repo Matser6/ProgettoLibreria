@@ -7,7 +7,6 @@ import java.util.List;
 
 public class OrdinamentoPerValutazione extends AbstractOrdinamento{
 
-
     @Override
     public Comparator<Libro> getComparatore() {
         return new ComparatorePerValutazione();

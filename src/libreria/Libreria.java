@@ -1,11 +1,9 @@
 package libreria;
-
 import libro.Libro;
-
 import memento.LibreriaMemento;
 import view.Observer;
-
 import java.io.IOException;
+import java.util.List;
 
 public interface Libreria {
 
@@ -13,7 +11,7 @@ public interface Libreria {
 
     public void aggiungiLibro(Libro l);
 
-    public  boolean contieneLibro(String isbn);
+    public boolean contieneLibro(String isbn);
 
     public void modificaLibro(Libro vecchio, Libro nuovo);
 
@@ -32,6 +30,5 @@ public interface Libreria {
     public LibreriaMemento salvaStato();
 
     public void ripristinaStato(LibreriaMemento memento);
-
 }
 
