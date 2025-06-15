@@ -1,9 +1,7 @@
 package ordinamento;
 
 import libro.Libro;
-
 import java.util.Comparator;
-import java.util.List;
 
 public class OrdinamentoPerValutazione extends AbstractOrdinamento{
 

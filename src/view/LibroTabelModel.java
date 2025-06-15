@@ -2,7 +2,6 @@ package view;
 
 import libreria.LibreriaLL;
 import libro.Libro;
-
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 

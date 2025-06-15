@@ -1,11 +1,11 @@
 package view;
 
-import libreria.Libreria;
 import libreria.LibreriaLL;
 import libro.Libro;
 import libro.StatoLettura;
 import memento.LibreriaMemento;
 import ordinamento.OrdinaPerTitolo;
+import ordinamento.OrdinamentoPerPagina;
 import ordinamento.OrdinamentoPerValutazione;
 import ricerca.*;
 
@@ -101,7 +101,7 @@ public class LibreriaGUI extends JFrame {
 
         /*------------------------------------------------------------------------*/
         //ordinamento
-        comboCriteriOrdinamento = new JComboBox<>(new String[]{"Di inserimento", "Titolo", "Valutazione"});
+        comboCriteriOrdinamento = new JComboBox<>(new String[]{"Default", "Titolo", "Valutazione", "Pagina"});
         comboOrdine = new JComboBox<>(new String[]{"Crescente", "Decrescente"});
         JButton ordinaBtn = new JButton("Ordina");
 
@@ -294,7 +294,7 @@ public class LibreriaGUI extends JFrame {
         String criterioOrdinamento = comboCriteriOrdinamento.getSelectedItem().toString();
         boolean crescente = comboOrdine.getSelectedItem().equals("Crescente");
         switch (criterioOrdinamento) {
-            case "Di inserimento":
+            case "Default":
                 libreria.ripristinaLibriDaVisualizzare();
                 return;
             case "Titolo":
@@ -302,6 +302,9 @@ public class LibreriaGUI extends JFrame {
                 break;
             case "Valutazione":
                 libreria.setOrdinamento(new OrdinamentoPerValutazione());
+                break;
+            case "Pagina":
+                libreria.setOrdinamento(new OrdinamentoPerPagina());
                 break;
         }
         libreria.ordina(crescente);

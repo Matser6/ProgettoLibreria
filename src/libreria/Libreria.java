@@ -3,7 +3,6 @@ import libro.Libro;
 import memento.LibreriaMemento;
 import view.Observer;
 import java.io.IOException;
-import java.util.List;
 
 public interface Libreria {
 

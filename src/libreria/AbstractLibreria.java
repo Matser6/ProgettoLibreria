@@ -10,7 +10,7 @@ public abstract class AbstractLibreria implements Libreria {
     List<Observer> observers;
 
     public AbstractLibreria() {
-        observers = new ArrayList<Observer>();
+        observers = new ArrayList<>();
     }
 
     @Override
@@ -29,6 +29,4 @@ public abstract class AbstractLibreria implements Libreria {
             o.update();
         }
     }
-
-
 }

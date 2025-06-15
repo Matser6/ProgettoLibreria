@@ -4,9 +4,6 @@ import libro.Libro;
 import memento.LibreriaMemento;
 import ordinamento.AbstractOrdinamento;
 import ricerca.AbstractRicerca;
-
-import view.Observer;
-
 import java.io.*;
 import java.util.*;
 

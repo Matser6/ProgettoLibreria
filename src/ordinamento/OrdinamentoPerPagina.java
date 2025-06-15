@@ -1,26 +1,26 @@
 package ordinamento;
 
 import libro.Libro;
+
 import java.util.Comparator;
 
-public class OrdinaPerTitolo extends AbstractOrdinamento{
+public class OrdinamentoPerPagina extends AbstractOrdinamento {
 
     @Override
     public Comparator<Libro> getComparatore() {
-        return new ComparatorePerTitolo();
+        return null;
     }
 
     @Override
     public Comparator<Libro> getComparatoreReversed() {
-        return new ComparatorePerTitolo().reversed();
+        return null;
     }
 
-    public class ComparatorePerTitolo implements Comparator<Libro> {
+    public class ComparatorePerPagina implements Comparator<Libro> {
 
         @Override
         public int compare(Libro o1, Libro o2) {
-            if (o1 == null || o2 == null) return 0;
-            return o1.getTitolo().compareToIgnoreCase(o2.getTitolo());
+            return Integer.compare(o1.getSegnaPagina(), o2.getSegnaPagina());
         }
 
         @Override

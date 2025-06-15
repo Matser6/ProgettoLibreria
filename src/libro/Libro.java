@@ -79,16 +79,8 @@ public class Libro implements Serializable {
         return valutazione;
     }
 
-    public void setValutazione(Integer valutazione) {
-        this.valutazione = valutazione;
-    }
-
     public Integer getSegnaPagina() {
         return segnaPagina;
-    }
-
-    public void setSegnaPagina(Integer segnaPagina) {
-        this.segnaPagina = segnaPagina;
     }
 
     public StatoLettura getStatoLettura() {

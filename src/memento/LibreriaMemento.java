@@ -3,7 +3,6 @@ package memento;
 import libro.Libro;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class LibreriaMemento {
