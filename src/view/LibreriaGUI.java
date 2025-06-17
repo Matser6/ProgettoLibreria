@@ -177,7 +177,11 @@ public class LibreriaGUI extends JFrame {
     }
 
     private void undo() {
-        caretaker.undo(libreria);
+        try {
+            caretaker.undo(libreria);
+        } catch (NullPointerException e){
+            mostraWarningMessaggio(e.getMessage());
+        }
     }
 
     private void salvaStatoLibreria() {
