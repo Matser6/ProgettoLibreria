@@ -76,8 +76,8 @@ public final class LibreriaLL extends AbstractLibreria {
         int val;
         if(valutazione > 10){
             val = 10;
-        } else if (valutazione < 1) {
-            val = 1;
+        } else if (valutazione < 0) {
+            val = 0;
         } else {
             val = valutazione;
         }

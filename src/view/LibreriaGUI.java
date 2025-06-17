@@ -3,7 +3,7 @@ package view;
 import libreria.LibreriaLL;
 import libro.Libro;
 import libro.StatoLettura;
-import memento.LibreriaMemento;
+import memento.LibreriaCaretaker;
 import ordinamento.OrdinaPerTitolo;
 import ordinamento.OrdinamentoPerPagina;
 import ordinamento.OrdinamentoPerValutazione;
@@ -12,7 +12,6 @@ import ricerca.*;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.util.Stack;
 
 public class LibreriaGUI extends JFrame {
     private JTable tabellaLibri;
@@ -20,7 +19,7 @@ public class LibreriaGUI extends JFrame {
     private LibreriaLL libreria;
     private boolean nonMostrare = false;
     private String pathDelFile = "";
-    private Stack<LibreriaMemento> history = new Stack<>();
+    private LibreriaCaretaker caretaker = new LibreriaCaretaker();
 
     //ricerca dei libri
     private JTextField campoRicerca;
@@ -178,15 +177,11 @@ public class LibreriaGUI extends JFrame {
     }
 
     private void undo() {
-        if(!history.isEmpty()) {
-            libreria.ripristinaStato(history.pop());
-        } else {
-            mostraWarningMessaggio("Non ci sono azioni da annullare");
-        }
+        caretaker.undo(libreria);
     }
 
     private void salvaStatoLibreria() {
-        history.push(libreria.salvaStato());
+        caretaker.salvaStatoLibreria(libreria);
     }
 
     private void aggiungiValutazione() {
@@ -195,7 +190,7 @@ public class LibreriaGUI extends JFrame {
             JTextField valutazioneField = new JTextField(15);
             valutazioneField.addKeyListener(new IntegerKeyListener());
             JPanel panel = new JPanel(new GridLayout(0, 1));
-            panel.add(new JLabel("Valuta da 1 a 10:"));
+            panel.add(new JLabel("Valuta da 0 a 10:"));
             panel.add(valutazioneField);
             int result = JOptionPane.showConfirmDialog(this, panel, "Aggiungi una valutazione", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
