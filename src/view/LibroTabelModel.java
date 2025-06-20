@@ -1,15 +1,15 @@
 package view;
 
-import libreria.LibreriaLL;
+import libreria.ConcreteLibreria;
 import libro.Libro;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 class LibroTableModel extends AbstractTableModel implements Observer {
     private final String[] colonne = {"Titolo", "Autore", "ISBN", "Genere", "Valutazione", "Pagina", "Stato Lettura"};
-    private final LibreriaLL libreria;
+    private final ConcreteLibreria libreria;
 
-    public LibroTableModel(LibreriaLL libreria) {
+    public LibroTableModel(ConcreteLibreria libreria) {
         this.libreria = libreria;
     }
 

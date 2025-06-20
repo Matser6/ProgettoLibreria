@@ -1,6 +1,7 @@
 package libro;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Libro implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -24,14 +25,14 @@ public class Libro implements Serializable {
         private Integer segnaPagina = 0;
 
         public BuilderLibro(String titolo, String autore, String isbn, String genere, StatoLettura statoLettura) {
-            if(!(titolo.isEmpty() || autore.isEmpty() || isbn.isEmpty() || genere.isEmpty())) {
+            if(!(titolo.isEmpty() || autore.isEmpty() || isbn.isEmpty() || genere.isEmpty() || statoLettura == null)) {
                 this.titolo = titolo;
                 this.autore = autore;
                 this.isbn = isbn;
                 this.genere = genere;
                 this.statoLettura = statoLettura;
             } else {
-                throw new IllegalArgumentException("i campi: titolo, autore, isbn e genere non possono essere vuoti");
+                throw new IllegalArgumentException("i campi: titolo, autore, isbn, genere e stato lettura non possono essere vuoti");
             }
         }
 
@@ -87,13 +88,29 @@ public class Libro implements Serializable {
         return statoLettura;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
+        Libro libro = (Libro) o;
+        return (this.getTitolo().equals(libro.getTitolo()) && this.getAutore().equals(libro.getAutore())) || (this.getIsbn().equals(libro.getIsbn()) && this.getGenere().equals(libro.getGenere()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTitolo(), getAutore(), getIsbn());
+    }
+
     public String toString() {
         String s = "titolo: " + titolo +
                 "\nautore: " + autore +
                 "\nisbn: " + isbn +
                 "\ngenere: " + genere +
                 "\nvalutazione: " + valutazione +
-                "\n" + statoLettura.toString();
+                "\nsegnaPagina: " + segnaPagina +
+                "\nstatoLettura:" + statoLettura.toString();
         return s;
     }
 }

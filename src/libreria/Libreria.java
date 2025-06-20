@@ -10,9 +10,11 @@ public interface Libreria {
 
     public void aggiungiLibro(Libro l);
 
-    public boolean contieneLibro(String isbn);
+    public boolean contieneLibro(Libro libro);
 
     public void modificaLibro(Libro vecchio, Libro nuovo);
+
+    public Libro getLibro(String isbn);
 
     public void svuotaLibreria();
 

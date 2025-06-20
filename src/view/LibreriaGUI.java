@@ -1,6 +1,6 @@
 package view;
 
-import libreria.LibreriaLL;
+import libreria.ConcreteLibreria;
 import libro.Libro;
 import libro.StatoLettura;
 import memento.LibreriaCaretaker;
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class LibreriaGUI extends JFrame {
     private JTable tabellaLibri;
     private LibroTableModel tableModel;
-    private LibreriaLL libreria;
+    private ConcreteLibreria libreria;
     private boolean nonMostrare = false;
     private String pathDelFile = "";
     private LibreriaCaretaker caretaker = new LibreriaCaretaker();
@@ -31,7 +31,7 @@ public class LibreriaGUI extends JFrame {
     public LibreriaGUI() {
         super("Libreria");
 
-        libreria = LibreriaLL.getIstance();
+        libreria = ConcreteLibreria.getInstance();
         tableModel = new LibroTableModel(libreria);
         libreria.registerObserver(tableModel);
         tabellaLibri = new JTable(tableModel);
@@ -318,22 +318,22 @@ public class LibreriaGUI extends JFrame {
         String criterio = (String) comboCriteriRicerca.getSelectedItem();
         switch (criterio) {
             case "Titolo":
-                libreria.setMethod(new RicercaPerTitolo());
+                libreria.setRicerca(new RicercaPerTitolo());
                 break;
             case "Autore":
-                libreria.setMethod(new RicercaPerAutore());
+                libreria.setRicerca(new RicercaPerAutore());
                 break;
             case "ISBN":
-                libreria.setMethod(new RicercaPerIsbn());
+                libreria.setRicerca(new RicercaPerIsbn());
                 break;
             case "Genere":
-                libreria.setMethod(new RicercaPerGenere());
+                libreria.setRicerca(new RicercaPerGenere());
                 break;
             case "Valutazione":
-                libreria.setMethod(new RicercaPerValutazione());
+                libreria.setRicerca(new RicercaPerValutazione());
                 break;
             case "Stato lettura":
-                libreria.setMethod(new RicercaPerStatoLettura());
+                libreria.setRicerca(new RicercaPerStatoLettura());
                 break;
         }
         libreria.ricercaLibri(testo);
@@ -376,7 +376,6 @@ public class LibreriaGUI extends JFrame {
                             genereField.getText(),
                             (StatoLettura) statoCombo.getSelectedItem()
                     )
-                            .valutazione(selezionato.getValutazione())
                             .build();
                     salvaStatoLibreria();
                     libreria.modificaLibro(selezionato, nuovo);
